@@ -9,27 +9,26 @@ const albumsData = require("./albums.json");
  
 
 app.get("/albums", function (request, response) {
-    // let albums = getAlbums();
 response.send(albumsData);
   });
 
 //get album by id .....................................
 
-app.get("/album/:albumId",function(request, response){
-    const Id = parseInt(request.params.albumId);
+app.get("/albums/:albumId",function(request, response){
+    const Id = request.params.albumId
     console.log(Id);
     const newAlbum = albumsData.find((element)=>{
-      return element.Id ==Id;
+      return element.albumId ==Id;
     })
     console.log(newAlbum);
-      response.json(newAlbum);
+      response.send(newAlbum);
     });
 
 
 //post albums:::::::::::::::::::::::
-  app.post("/albums", function(request,response){
-    let rawdata = fs.readFileSync('albums.json');
-    let allAlbum= JSON.parse(rawdata);
+  app.post("/albums/addnew", function(request,response){
+    // let rawdata = fs.readFileSync('albums.json');
+     let allAlbum = JSON.parse(fs.readFileSync('albums.json')); 
     let newAlbum = request.body; 
     console.log(newAlbum);
     newAlbum.albumId = allAlbum.length.toString();
@@ -38,44 +37,43 @@ app.get("/album/:albumId",function(request, response){
     //  // save the whole array to the quotes.json file 
      saveAlbum(allAlbum); 
     response.send(allAlbum);
-    ////////
   
   });
 
-  //delet album;;;;;;;;;;;;;;;;;;;;;;;;;
+  //delete album;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  app.delete("/albums/:albumId", function (req, res) { 
+  app.delete("/albums/:albumId", function (request, response) {
 
-      const id = req.params.albumId
-      console.log(id);
-      const deleteAlbum  = allAlbum.find((element)=>{
-        return element.Id ==Id;
+      const Id = request.params.albumId
+      console.log(Id);
+      const deleteAlbum  = albumsData.find((element)=>{
+        return element.albumId ==Id;
       })
        if(deleteAlbum){ 
-           let index = allAlbum.indexOf(deleteAlbum); 
-           allAlbum.slice(index, 0); 
-           res.send(deleteAlbum);
+           let index = albumsData.indexOf(deleteAlbum); 
+           albumsData.splice(index, 1); 
+           response.send(deleteAlbum);
          } 
            else {
-                res.send("This album doesnt exist"); 
+                response.send("This album doesnt exist"); 
             } 
 
-            saveAlbum(allAlbum);  
+            saveAlbum(albumsData);  
         });
 
 
  /// Aux function:::::::::::::
 
- const allAlbum = () => {
-    // using global variable "fs" ^ defined at the top part of server.js
-    let rawdata = fs.readFileSync('albums.json');
-    return JSON.parse(rawdata);
-};
-const saveAlbum = albums => {
-    let data = JSON.stringify(albums);
+//  const allAlbum = () => {
+//     // using global variable "fs" ^ defined at the top part of server.js
+//     let rawdata = fs.readFileSync('albums.json');
+//     return JSON.parse(rawdata);
+// };
+const saveAlbum = albumsData => {
+    let data = JSON.stringify(albumsData);
     fs.writeFileSync('albums.json', data);
 };
 
   app.listen(3043, function () {
-    console.log("Server is listening on port 3033. Ready to accept requests!");
+    console.log("Server is listening on port 3043. Ready to accept requests!");
     }); 
